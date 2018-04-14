@@ -2,30 +2,61 @@
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="style.css">
 <body>
+
+<div id="form">
+    <button id="button">RESET ME TO ORIGINAL NODE</button>
+</div>
+<div id="box"></div>
+
+
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
+
 
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
     width = 960 - margin.right - margin.left,
     height = 800 - margin.top - margin.bottom;
+
+var realWidth = 1000;
+var realHeight = window.innerHeight;
+
+var m = [40, 240, 40, 240],
+    w = realWidth -m[0] -m[0],
+    h = realHeight -m[0] -m[2],
+    i = 0,
+    root;
 
 var i = 0,
     duration = 750,
     root;
 
 var tree = d3.layout.tree()
-    .size([700, 1000]);
+    .size([h, w]);
 
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.right + margin.left)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + 200 + "," + margin.top + ")");
+// var svg = d3.select("body").append("svg")
+//     .attr("width", width + margin.right + margin.left)
+//     .attr("height", height + margin.top + margin.bottom)
+//   .append("g")
+//     .attr("transform", "translate(" + 200 + "," + margin.top + ")");
 
-d3.json("result.json", function(error, flare) {
+var svg = d3.select("#box").append("svg:svg")
+    .attr("class","svg_container")
+    .attr("width", w)
+    .attr("height", h)
+    .style("overflow", "scroll")
+    .style("background-color","#EEEEEE")
+  .append("svg:g")
+    .attr("class","drawarea")
+  .append("svg:g")
+    .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+var botao = d3.select("#form #button");
+
+
+d3.json("flare.json", function(error, flare) {
   if (error) throw error;
 
   root = flare;
@@ -45,6 +76,32 @@ d3.json("result.json", function(error, flare) {
 });
 
 d3.select(self.frameElement).style("height", "800px");
+
+d3.select("svg")
+    .call(d3.behavior.zoom()
+      .scaleExtent([0.5, 5])
+      .on("zoom",zoom));
+
+
+function zoom() {
+    var scale = d3.event.scale,
+      translation = d3.event.translate,
+      tbound = -h *scale,
+      bbound = h * scale,
+      lbound = (-w+m[1]) * scale,
+      rbound = (w-m[3]) * scale;
+
+    translation = [
+      Math.max(Math.min(translation[0], rbound), lbound),
+      Math.max(Math.min(translation[1], bbound), tbound)
+    ];
+
+    d3.select(".drawarea")
+        .attr("transform", "translate(" + translation + ")" + "scale(" + scale + ")");
+
+}
+
+
 
 function update(source) {
 
@@ -146,3 +203,5 @@ function click(d) {
 }
 
 </script>
+</body>
+</html>
