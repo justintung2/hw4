@@ -11,7 +11,7 @@ with open("yelp.csv", 'r') as data_file:
 	for row in data:
 		type_item = d.get(row['type'], dict())
 		cat_item = type_item.get(row['category'], list())
-		cat_item.append({'name':row['name'], 'rating':row['rating']})
+		cat_item.append(row)
 		type_item[row['category']] = cat_item
 		d[row['type']] = type_item
 
