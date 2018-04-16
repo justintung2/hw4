@@ -7,6 +7,7 @@
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.0/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.0/mapbox-gl.css' rel='stylesheet' />
 <link href="https://fonts.googleapis.com/css?family=Gugi" rel="stylesheet">
+<script src="http://code.jquery.com/jquery.js"></script>
 <body>
 
 <div class="description">
@@ -29,8 +30,6 @@
 
 
 <div id="map"></div>
-
-
 
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
@@ -55,7 +54,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
     map.addControl(new mapboxgl.Navigation());
     map.dragRotate.disable();
 
-    // Setup our svg layer that we can manipulate with d3
     var container = map.getCanvasContainer()
     var svg = d3.select(container).append("svg")
 
@@ -85,6 +83,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
 
     var coloryelp = "#034500"
 
+    $(document).ready(function() {
+        svg.selectAll("circle").remove();
+        display(datafile, coloryelp);
+    });
+
 
     function display(datafile, color) {
 
@@ -93,25 +96,21 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
 
         var points = data
 
-        
+
         var dots = svg.selectAll("circle.dot")
           .data(points.features);
-
 
 
         dots.enter().append("circle").classed("dot", true)
         .attr("r", 1)
         .style({
           fill: color,
-          "fill-opacity": 0.6,
+          "fill-opacity": 0.4,
           stroke: "#ff0000",
           "stroke-width": 1
         })
         .transition().duration(500)
         .attr("r", 6);
-
-        console.log(dots);
-
 
         
         function render() {
@@ -141,8 +140,9 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
 
         // render our initial visualization
         render()
-      })
-      }
+      
+      });
+};
 
 
 </script>
