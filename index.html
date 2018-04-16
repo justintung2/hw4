@@ -1,13 +1,155 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="style.css">
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src="//d3js.org/topojson.v1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.0/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.12.0/mapbox-gl.css' rel='stylesheet' />
+<link href="https://fonts.googleapis.com/css?family=Gugi" rel="stylesheet">
 <body>
+
+<div class="description">
+  <h1>Indecisive much?</h1>
+  <p>Pittsburgh has a lot to offer. Whether it's food, shopping, or you're eager to see the Steelers
+    lose their next football match, there's always something entertaining in the Paris of Appalachia.
+    <br/><br/><br/> Use the tree to the right to make a decision by clicking on the nodes. You can minimize the tree
+    by clicking on any preceding node.
+    <br/><br/><br/> You can also use the map if you're visually challenged or if you're terrible at 
+    directions.
+</p>
+
+</div>
+
+
 
 <div id="form"></div>
 <div id="box"></div>
 
 
+<div id="map"></div>
+
+
+
 <script src="//d3js.org/d3.v3.min.js"></script>
+<script>
+
+
+mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0YTRyZnBnMHMifQ.yhMtx5-uADU9vqGlVgQT4g'
+
+    var bounds = [
+    [-80.1873, 40.2626], // Southwest coordinates
+    [-79.6848, 40.6740]  // Northeast coordinates
+];
+    //Setup mapbox-gl map
+    var map = new mapboxgl.Map({
+      container: 'map', // container id
+      style: 'mapbox://styles/jt689sp18/cjermwxog6yhs2sqbcjxtc4nf',
+      center: [-79.992021,40.441235],
+      zoom: 13,
+      maxBounds: bounds
+      
+    })
+    map.scrollZoom.disable()
+    map.addControl(new mapboxgl.Navigation());
+    map.dragRotate.disable();
+
+    // Setup our svg layer that we can manipulate with d3
+    var container = map.getCanvasContainer()
+    var svg = d3.select(container).append("svg")
+
+
+
+    function getD3() {
+      var bbox = document.querySelector("svg").getBoundingClientRect();
+      var center = map.getCenter();
+      var zoom = map.getZoom();
+    
+      var scale = (512) * 0.5 / Math.PI * Math.pow(2, zoom);
+
+      var d3projection = d3.geo.mercator()
+        .center([center.lng, center.lat])
+        .translate([bbox.width/2, bbox.height/2])
+        .scale(scale);
+
+        console.log([bbox.width/2, bbox.height/2], center, scale);
+
+      return d3projection;
+    }
+    // calculate the original d3 projection
+    var d3Projection = getD3();
+    
+    var path = d3.geo.path();
+
+
+    var datafile = "result.json"; 
+
+    var coloryelp = "#034500"
+
+
+
+    function display(datafile, color) {
+
+
+        d3.json(datafile, function(err, data) {
+
+        var points = data
+
+        
+        var dots = svg.selectAll("circle.dot")
+          .data(points.features);
+
+
+
+        dots.enter().append("circle").classed("dot", true)
+        .attr("r", 1)
+        .style({
+          fill: color,
+          "fill-opacity": 0.6,
+          stroke: "#ff0000",
+          "stroke-width": 1
+        })
+        .transition().duration(500)
+        .attr("r", 6);
+
+        console.log(dots);
+
+
+        
+        function render() {
+          d3Projection = getD3();
+          path.projection(d3Projection)
+          
+          dots
+          .attr({
+            cx: function(d) { 
+              var x = d3Projection(d.geometry.coordinates)[0];
+              return x
+            },
+            cy: function(d) { 
+              var y = d3Projection(d.geometry.coordinates)[1];
+              return y
+            },
+          })
+        }
+
+        // re-render our visualization whenever the view changes
+        map.on("viewreset", function() {
+          render()
+        })
+        map.on("move", function() {
+          render()
+        })
+
+        // render our initial visualization
+        render()
+      })
+      }
+
+
+</script>
+<hr>
+
 <script>
 
 
@@ -34,11 +176,6 @@ var tree = d3.layout.tree()
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
-// var svg = d3.select("body").append("svg")
-//     .attr("width", width + margin.right + margin.left)
-//     .attr("height", height + margin.top + margin.bottom)
-//   .append("g")
-//     .attr("transform", "translate(" + 200 + "," + margin.top + ")");
 
 var svg = d3.select("#box").append("svg:svg")
     .attr("class","svg_container")
