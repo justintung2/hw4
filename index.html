@@ -73,8 +73,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
         .translate([bbox.width/2, bbox.height/2])
         .scale(scale);
 
-        console.log([bbox.width/2, bbox.height/2], center, scale);
-
       return d3projection;
     }
     // calculate the original d3 projection
@@ -86,7 +84,6 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
     var datafile = "result.json"; 
 
     var coloryelp = "#034500"
-
 
 
     function display(datafile, color) {
@@ -237,6 +234,11 @@ function zoom() {
 
 
 
+// TREE CODE BELOW ///////////////////////////////////////////////////////////////////////////////
+
+
+
+
 function update(source) {
 
   // Compute the new tree layout.
@@ -329,6 +331,7 @@ function click(d) {
   if (d.children) {
     d._children = d.children;
     d.children = null;
+
   } else {
     d.children = d._children;
     d._children = null;
