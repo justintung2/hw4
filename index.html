@@ -81,24 +81,33 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
 
     var datafile = "result.json"; 
 
-    var coloryelp = "#034500"
+    var coloryelp = "orange";
 
-    $(document).ready(function() {
-        svg.selectAll("circle").remove();
-        display(datafile, coloryelp);
-    });
+    // $(document).ready(function() {
+    //     svg.selectAll("#map").remove();
+    //     display(datafile, coloryelp);
+    // });
 
 
     function display(datafile, color) {
 
 
         d3.json(datafile, function(err, data) {
+          var svg = d3.select("#map").select("svg");
 
-        var points = data
-
+        var points = data.children[0].children[0].children;
+        console.log(points);
 
         var dots = svg.selectAll("circle.dot")
-          .data(points.features);
+          .data(points.map(d => {
+            var f = {"type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [d.longitude, d.latitude]
+              }
+            };
+            return f;
+          }));
 
 
         dots.enter().append("circle").classed("dot", true)
@@ -145,8 +154,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
 };
 
 
+
 </script>
-<hr>
 
 <script>
 
@@ -324,6 +333,7 @@ function update(source) {
     d.x0 = d.x;
     d.y0 = d.y;
   });
+
 }
 
 // Toggle children on click.
@@ -337,7 +347,34 @@ function click(d) {
     d._children = null;
   }
   update(d);
+
+
+
+  if(d.latitude!=null) { //really improper way of seeing if the specific restaurant node is clicked
+    display(datafile, coloryelp);
+  var dots = svg.select("circle.dot")
+          .data([{
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": [d.longitude, d.latitude]
+            }
+          }]);
+
+
+        dots.enter().append("circle").classed("dot", true)
+        .attr("r", 1)
+        .style({
+          "fill-opacity": 0.4,
+          stroke: "#ff0000",
+          "stroke-width": 1
+        })
+        .transition().duration(500)
+        .attr("r", 6);
+ }
+
 }
+
 
 </script>
 </body>

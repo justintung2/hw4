@@ -1,18 +1,10 @@
 body {
-	height:1500px;
+	height:100%;
 	background-color: #f9f9f9;
 	font-family: 'Gugi', cursive;
   width:100%;
   overflow-x: hidden;
-}
-
-hr {
-	display:block;
-	position:relative;
-	top:755px;
-	width:900px;
-	left:190px;
-	border-bottom: 5px #ccc;
+  margin:0;top:0;right:0;bottom:0;left:0;
 }
 
 .description{
@@ -23,20 +15,19 @@ hr {
 }
 
 #map { 
-  position:absolute; 
+  position:absolute;
   left:380px;
-  top:790px;
+  top:700px;
   width: 73%;
-  height: 70%;
+  height: 80%;
    }
 
 svg {
   position: absolute;
-  margin:auto;
   top:30px;
   left:380px;
   width: 73%;
-  height: 87%;
+  height: 80%;
    }
 
 .node {
@@ -50,7 +41,7 @@ svg {
 }
 
 .node text {
-  font: 14px sans-serif;
+  font: 17px sans-serif;
 }
 
 .link {
