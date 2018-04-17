@@ -46,7 +46,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
       container: 'map', // container id
       style: 'mapbox://styles/jt689sp18/cjermwxog6yhs2sqbcjxtc4nf',
       center: [-79.992021,40.441235],
-      zoom: 13,
+      zoom: 10,
       maxBounds: bounds
       
     })
@@ -89,29 +89,37 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
     // });
 
 
-    function display(datafile, color) {
+    function display(datafile, color, d) {
 
 
-        d3.json(datafile, function(err, data) {
+        // d3.json(datafile, function(err, data) {
           var svg = d3.select("#map").select("svg");
 
-        var points = data.children[0].children[0].children;
-        console.log(points);
+        //var points = data.children[0].children[1].children;
+        //var points = d;
+        console.log(d);
+        console.log(d.longitude, d.latitude)
 
-        var dots = svg.selectAll("circle.dot")
-          .data(points.map(d => {
-            var f = {"type": "Feature",
+        var f = {"type": "Feature",
             "geometry": {
               "type": "Point",
               "coordinates": [d.longitude, d.latitude]
               }
             };
-            return f;
-          }));
+        console.log(f);
 
+        d3Projection = getD3();
+          path.projection(d3Projection);
 
-        dots.enter().append("circle").classed("dot", true)
+        var dots = svg.selectAll("circle.dot")
+        .data(f)
+        .enter()
+        .append("circle")
         .attr("r", 1)
+        .attr("cx", function(l) {return d3Projection(l.geometry.coordinates[0]);
+        })
+        .attr("cy", function(l) {return d3Projection(l.geometry.coordinates[1]);
+        	})
         .style({
           fill: color,
           "fill-opacity": 0.4,
@@ -120,24 +128,52 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
         })
         .transition().duration(500)
         .attr("r", 6);
+        
+        // var dots = svg.selectAll("circle.dot")
+        //   .data(d => {
+        //   	console.log(d);
+        //     var f = {"type": "Feature",
+        //     "geometry": {
+        //       "type": "Point",
+        //       "coordinates": [d.longitude, d.latitude]
+        //       }
+        //     };
+        //     console.log(f);
+        //     return f;
+        //   });
+
+       
+
+        // dots.enter().append("circle").classed("dot", true)
+        // .attr("r", 1)
+        // .style({
+        //   fill: color,
+        //   "fill-opacity": 0.4,
+        //   stroke: "#ff0000",
+        //   "stroke-width": 1
+        // })
+        // .transition().duration(500)
+        // .attr("r", 6);
 
         
         function render() {
           d3Projection = getD3();
-          path.projection(d3Projection)
+          path.projection(d3Projection);
+
+          console.log("here");
           
-          dots
-          .attr({
-            cx: function(d) { 
-              var x = d3Projection(d.geometry.coordinates)[0];
-              return x
-            },
-            cy: function(d) { 
-              var y = d3Projection(d.geometry.coordinates)[1];
-              return y
-            },
-          })
-        }
+        //   dots
+        //   .attr({
+        //     cx: function(d) { 
+        //       var x = d3Projection(d.geometry.coordinates)[0];
+        //       return x
+        //     },
+        //     cy: function(d) { 
+        //       var y = d3Projection(d.geometry.coordinates)[1];
+        //       return y
+        //     },
+        //   })
+        // }
 
         // re-render our visualization whenever the view changes
         map.on("viewreset", function() {
@@ -150,8 +186,11 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
         // render our initial visualization
         render()
       
-      });
-};
+      };
+
+// });
+    };
+
 
 
 
@@ -351,26 +390,27 @@ function click(d) {
 
 
   if(d.latitude!=null) { //really improper way of seeing if the specific restaurant node is clicked
-    display(datafile, coloryelp);
-  var dots = svg.select("circle.dot")
-          .data([{
-            "type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [d.longitude, d.latitude]
-            }
-          }]);
+    display(datafile, coloryelp, d);
+
+  	// var dots = svg.select("circle.dot")
+   //        .data([{
+   //          "type": "Feature",
+   //          "geometry": {
+   //            "type": "Point",
+   //            "coordinates": [d.longitude, d.latitude]
+   //          }
+   //        }]);
 
 
-        dots.enter().append("circle").classed("dot", true)
-        .attr("r", 1)
-        .style({
-          "fill-opacity": 0.4,
-          stroke: "#ff0000",
-          "stroke-width": 1
-        })
-        .transition().duration(500)
-        .attr("r", 6);
+        // dots.enter().append("circle").classed("dot", true)
+        // .attr("r", 1)
+        // .style({
+        //   "fill-opacity": 0.4,
+        //   stroke: "#ff0000",
+        //   "stroke-width": 1
+        // })
+        // .transition().duration(500)
+        // .attr("r", 6);
  }
 
 }
