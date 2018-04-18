@@ -1,3 +1,5 @@
+<!-- Credit to StackOverflow and https://gist.github.com/enjalot/0d87f32a1ccb9a720d29ba74142ba365 for the tutorial. Basic tree structure is from https://bl.ocks.org/mbostock/4339083, the one and only Mike Bostock. The tree structure looks super similar, but we added some CSS elements and did all of the data parsing (including making the nested data structure on our own. Check out the script.py file for more on this.) -->
+
 <!DOCTYPE html>
 <meta charset="utf-8">
 <link rel="stylesheet" type="text/css" href="style.css">
@@ -17,12 +19,10 @@
     <br/><br/><br/> Use the tree to the right to make a decision by clicking on the nodes. You can minimize the tree
     by clicking on any preceding node. Scroll up to zoom out and scroll down to zoom in. Click and drag the screen 
     to pan around.
-    <br/><br/><br/> You can also use the map if you're visually challenged or if you're terrible at 
-    directions.
+    <br/><br/><br/> If you click on the name of specific place, its location (red circle) will appear on the map below. You can click and drag on the map to move around.
 </p>
 
 </div>
-
 
 
 <div id="form"></div>
@@ -46,12 +46,13 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
       container: 'map', // container id
       style: 'mapbox://styles/jt689sp18/cjermwxog6yhs2sqbcjxtc4nf',
       center: [-79.992021,40.441235],
-      zoom: 12,
+      zoom: 12.5,
       maxBounds: bounds
       
     })
     map.scrollZoom.disable()
-    map.addControl(new mapboxgl.Navigation());
+    // map.addControl(new mapboxgl.Navigation());
+    map.doubleClickZoom.disable();
     map.dragRotate.disable();
 
     var container = map.getCanvasContainer()
@@ -81,86 +82,46 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
 
     var datafile = "result.json"; 
 
-    var coloryelp = "orange";
-
-    // $(document).ready(function() {
-    //     display(datafile, coloryelp);
-    // });
+    var coloryelp = "red";
 
 
     function display(datafile, color, d) {
 
-
-        // d3.json(datafile, function(err, data) {
-        var svg = d3.select("#map").select("svg");
-
-        //var points = data.children[0].children[1].children;
-        //var points = d;
-        console.log(d);
-        console.log(d.longitude, d.latitude)
-
-        var f = {"type": "Feature",
-            "geometry": {
-              "type": "Point",
-              "coordinates": [d.longitude, d.latitude]
-              }
-            };
-
-        d3Projection = getD3();
-          path.projection(d3Projection);
+          d3.json(datafile, function(err, data) {
+          var svg = d3.select("#map").select("svg");
 
 
+        //console.log(points);
+        point = [d];
 
-        // var dots = svg.select("circle")
-        // .data(f)
-        // .enter()
-        // .append("circle")
-        // .attr("r", 2)
-        // .attr("cx", function(l) {return d3Projection(l.geometry.coordinates[0]);
-        // })
-        // .attr("cy", function(l) {return d3Projection(l.geometry.coordinates[1]);
-        // 	})
-        // .style({
-        //   "fill-opacity": 0.4,
-        //   stroke: "red",
-        //   "stroke-width": 1
-        // })
-        // .attr("r", 6);
-
-        
         var dots = svg.selectAll("circle.dot")
-          .data(f => {
+          .data(point.map(a => {
             var f = {"type": "Feature",
             "geometry": {
               "type": "Point",
-              "coordinates": [d.longitude, d.latitude]
+              "coordinates": [a.longitude, a.latitude]
               }
             };
-            console.log(f);
+            console.log(f)
             return f;
-          });
+          }));
 
-
-
-       
 
         dots.enter().append("circle").classed("dot", true)
         .attr("r", 1)
         .style({
           fill: color,
-          "fill-opacity": 0.4,
-          stroke: "#ff0000",
+          "fill-opacity": 0.8,
+          stroke: "orange",
           "stroke-width": 1
         })
         .transition().duration(500)
-        .attr("r", 6);
+        .attr("r", 11);
 
         
-
         function render() {
           d3Projection = getD3();
-          path.projection(d3Projection);
-
+          path.projection(d3Projection)
           
           dots
           .attr({
@@ -186,9 +147,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoianQ2ODlzcDE4IiwiYSI6ImNqZXJtdTV2aTE2NW8yd2x0Y
         // render our initial visualization
         render()
       
-      };
-
-// });
+      });
+};
 
 
 
@@ -410,28 +370,10 @@ function click(d) {
 
 
 
-  if(d.latitude!=null) { //really improper way of seeing if the specific restaurant node is clicked
+  if(d.latitude!=null) { //really ratchet way of seeing if the specific restaurant node is clicked
     display(datafile, coloryelp, d);
 
-  	// var dots = svg.select("circle.dot")
-   //        .data([{
-   //          "type": "Feature",
-   //          "geometry": {
-   //            "type": "Point",
-   //            "coordinates": [d.longitude, d.latitude]
-   //          }
-   //        }]);
 
-
-        // dots.enter().append("circle").classed("dot", true)
-        // .attr("r", 1)
-        // .style({
-        //   "fill-opacity": 0.4,
-        //   stroke: "#ff0000",
-        //   "stroke-width": 1
-        // })
-        // .transition().duration(500)
-        // .attr("r", 6);
  }
 
 }
