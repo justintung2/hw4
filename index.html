@@ -281,7 +281,7 @@ function update(source) {
       .attr("dy", ".35em")
       .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
       .text(function(d) { return d.name; })
-      .on("mouseover", function(d){if(!d._children){
+      .on("mouseover", function(d){if(d.rating){
         div.transition()    
                 .duration(100)    
                 .style("opacity", .95);
@@ -290,12 +290,29 @@ function update(source) {
                 .style("top", (d3.event.pageY - 28) + "px");
       }})
       .on("mouseout", function(d) {
-        if(!d._children){
+        if(d.rating){
           div.transition()    
                 .duration(100)    
                 .style("opacity", 0); 
           
         }})
+      .style('fill', function(d) {
+        if(d.rating){
+          var r = parseFloat(d.rating),
+          color = 'black';
+          console.log(r);
+          if (r == 5){
+            color = '#20ba11';
+          } else if (r > 4) {
+            color = '#99a00c';
+          } else if (r > 3) {
+            color = '#935d09';
+          } else {
+            color = '#d42b00';
+          }
+          return color;
+        }
+      })
       .style("fill-opacity", 1e-6);
 
   // Transition nodes to their new position.
