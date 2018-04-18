@@ -224,6 +224,10 @@ var tree = d3.layout.tree()
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x]; });
 
+var div = d3.select("body").append("div")   
+    .attr("class", "tooltip")               
+    .style("opacity", 0);
+
 
 var svg = d3.select("#box").append("svg:svg")
     .attr("class","svg_container")
@@ -317,6 +321,21 @@ function update(source) {
       .attr("dy", ".35em")
       .attr("text-anchor", function(d) { return d.children || d._children ? "end" : "start"; })
       .text(function(d) { return d.name; })
+      .on("mouseover", function(d){if(!d._children){
+        div.transition()    
+                .duration(100)    
+                .style("opacity", .95);
+          div.html("Name: " + d.name + "<br/>Rating: " + d.rating + "<br/>Review Count: " + d['review count'] + "<br/>Neighborhood: " + d.neighborhood)
+          .style("left", (d3.event.pageX) + "px")   
+                .style("top", (d3.event.pageY - 28) + "px");
+      }})
+      .on("mouseout", function(d) {
+        if(!d._children){
+          div.transition()    
+                .duration(100)    
+                .style("opacity", 0); 
+          
+        }})
       .style("fill-opacity", 1e-6);
 
   // Transition nodes to their new position.
